@@ -3,9 +3,9 @@ on:
     tags:
       - '*'
 permissions:
-  id-token: write  # undocumented OIDC support.
-  packages: write
-  contents: read
+  id-token: write # Undocumented OIDC support.
+  packages: write # To publish container images to GHCR
+  contents: write # To create a release
 env:
   GH_TOKEN: $
 jobs:
