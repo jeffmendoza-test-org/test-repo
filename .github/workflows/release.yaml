@@ -1,0 +1,23 @@
+on:
+  push:
+    tags:
+      - '*'
+permissions:
+  id-token: write  # undocumented OIDC support.
+  packages: write
+  contents: read
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-go@v2
+      with:
+        go-version: 1.17
+    - uses: sigstore/cosign-installer@main
+    - run: go install github.com/google/ko@v0.10.0
+    - run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.workflow }} --password-stdin
+    - run: KO_DOCKER_REPO=ghcr.io/${{ github.repository_owner }} ko publish -B ./hello-world > container
+    - run: docker tag $(cat container) ghcr.io/${{ github.repository_owner }}/hello-world:${{ github.ref_name }}
+    - run: COSIGN_EXPERIMENTAL=1 cosign sign -a git_sha=$GITHUB_SHA ghcr.io/${{ github.repository_owner }}/hello-world
+    - run: gh release create ${{ github.ref_name }} --notes "ghcr.io/${{ github.repository_owner }}/hello-world:${{ github.ref_name }}"
