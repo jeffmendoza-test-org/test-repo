@@ -6,8 +6,6 @@ permissions:
   id-token: write # Undocumented OIDC support.
   packages: write # To publish container images to GHCR
   contents: write # To create a release
-env:
-  GH_TOKEN: $
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -25,3 +23,5 @@ jobs:
     - run: docker push ghcr.io/${{ github.repository_owner }}/hello-world:${{ github.ref_name }}
     - run: COSIGN_EXPERIMENTAL=1 cosign sign -a git_sha=$GITHUB_SHA ghcr.io/${{ github.repository_owner }}/hello-world
     - run: gh release create ${{ github.ref_name }} --notes "ghcr.io/${{ github.repository_owner }}/hello-world:${{ github.ref_name }}"
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
