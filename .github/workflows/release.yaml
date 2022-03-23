@@ -6,6 +6,8 @@ permissions:
   id-token: write  # undocumented OIDC support.
   packages: write
   contents: read
+env:
+  GH_TOKEN: $
 jobs:
   release:
     runs-on: ubuntu-latest
