@@ -18,6 +18,6 @@ jobs:
     - run: go install github.com/google/ko@v0.10.0
     - run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.workflow }} --password-stdin
     - run: KO_DOCKER_REPO=ghcr.io/${{ github.repository_owner }} ko publish -B ./hello-world > container
-    - run: docker tag $(docker images $(cat container) --format "{{.ID}}") ghcr.io/${{ github.repository_owner }}/hello-world:${{ github.ref_name }}
+    - run: docker tag $(docker images --format "{{.ID}}" $(cat container)) ghcr.io/${{ github.repository_owner }}/hello-world:${{ github.ref_name }}
     - run: COSIGN_EXPERIMENTAL=1 cosign sign -a git_sha=$GITHUB_SHA ghcr.io/${{ github.repository_owner }}/hello-world
     - run: gh release create ${{ github.ref_name }} --notes "ghcr.io/${{ github.repository_owner }}/hello-world:${{ github.ref_name }}"
